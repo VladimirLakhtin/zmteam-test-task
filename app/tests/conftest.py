@@ -9,13 +9,12 @@ from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 
 from app.auth import get_current_user
+from app.crud import TaskCRUD
 from app.dependencies import get_db_session
 from app.infrastructure.config import settings
 from app.main import main_app
 from app.models.base import Base
-from app.schemas import TokenData
-from crud import TaskCRUD
-from schemas import TaskCreate
+from app.schemas import TokenData, TaskCreate
 
 TEST_DATABASE_URL = f'postgresql+asyncpg://{settings.db.user}:{settings.db.password}@localhost:5434/zmteam_test'
 
