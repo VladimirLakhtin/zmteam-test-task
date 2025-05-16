@@ -21,7 +21,7 @@ main_app = FastAPI(
     lifespan=lifespan,
 )
 
-main_app.include_router(router, prefix=settings.api_prefix.prefix)
+main_app.include_router(router, prefix=settings.api_prefix.api)
 
 if __name__ == '__main__':
     uvicorn.run(
