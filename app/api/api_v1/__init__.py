@@ -1,3 +1,5 @@
+"""API v1 router initialization module."""
+
 from fastapi import APIRouter, Depends
 
 from app.api.api_v1.tasks import router as task_router

@@ -1,3 +1,5 @@
+"""Test configuration and fixtures module."""
+
 import asyncio
 from datetime import datetime, timezone, timedelta
 from typing import AsyncGenerator, Generator
@@ -73,9 +75,8 @@ async def async_client(db_session: AsyncSession) -> AsyncClient:
 
 @pytest.fixture(scope="function")
 async def test_tasks(db_session: AsyncSession) -> list[dict]:
-    """Create two test tasks and return their data."""
+    """Create test tasks and authentication token."""
     task_crud = TaskCRUD()
-
     tasks_data = [
         {
             "id": 1,

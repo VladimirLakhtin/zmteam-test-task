@@ -1,3 +1,5 @@
+"""Task API test module."""
+
 from datetime import datetime, timezone, timedelta
 
 import pytest
@@ -42,6 +44,7 @@ async def test_create_task(
         async_client: AsyncClient, db_session: AsyncSession,
         task_data, status_code,
 ):
+    """Test task creation."""
     response = await async_client.post(f"{PREFIX}/create", json=task_data)
     assert response.status_code == status_code
     if status_code != status.HTTP_201_CREATED:
@@ -68,6 +71,7 @@ async def test_create_task(
 async def test_get_task_list(
         async_client: AsyncClient, test_tasks: list[dict],
 ):
+    """Test get list of tasks."""
     response = await async_client.get(f"{PREFIX}/list")
     assert response.status_code == status.HTTP_200_OK
     tasks = response.json()
@@ -88,6 +92,7 @@ async def test_get_single_task(
         async_client: AsyncClient, test_tasks: list[dict],
         task_id, status_code,
 ):
+    """Test get task by id."""
     response = await async_client.get(f"{PREFIX}/{task_id}")
 
     assert response.status_code == status_code
@@ -111,6 +116,7 @@ async def test_update_task(
         async_client: AsyncClient, test_tasks: list[dict],
         task_id, update_data, status_code
 ):
+    """Test task update."""
     response = await async_client.patch(f"{PREFIX}/{task_id}/update", json=update_data)
 
     assert response.status_code == status_code
@@ -134,6 +140,7 @@ async def test_delete_task(
         async_client: AsyncClient, test_tasks: list[dict],
         task_id, status_code,
 ):
+    """Test task delete."""
     response = await async_client.delete(f"{PREFIX}/{task_id}")
 
     assert response.status_code == status_code

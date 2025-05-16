@@ -1,3 +1,5 @@
+"""Task management API endpoints module."""
+
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -16,11 +18,19 @@ async def create_new_task_endpoint(
         db: AsyncSession = Depends(get_db_session),
         task_crud: TaskCRUD = Depends(get_task_crud)
 ):
-    """
-    Create a new task record in the database.
+    """Create a new task record in the database.
     
-    - **datetime_to_do**: Expected execution time for the task (UTC recommended).
-    - **task_info**: Information about the task.
+    Args:
+        task_payload (TaskCreate): Task creation data including datetime and info
+        db (AsyncSession): Database session
+        task_crud (TaskCRUD): Task CRUD operations handler
+        
+    Returns:
+        Task: Created task data
+        
+    Note:
+        - datetime_to_do: Expected execution time for the task (UTC recommended)
+        - task_info: Information about the task
     """
     db_task = await task_crud.create(db=db, obj_in=task_payload)
     return db_task
@@ -33,11 +43,16 @@ async def read_all_tasks_endpoint(
         db: AsyncSession = Depends(get_db_session),
         task_crud: TaskCRUD = Depends(get_task_crud)
 ):
-    """
-    Retrieve a list of all tasks.
+    """Retrieve a list of all tasks with pagination support.
     
-    - **skip**: Number of records to skip (for pagination).
-    - **limit**: Maximum number of records to return (for pagination).
+    Args:
+        skip (int): Number of records to skip (for pagination)
+        limit (int): Maximum number of records to return (for pagination)
+        db (AsyncSession): Database session
+        task_crud (TaskCRUD): Task CRUD operations handler
+        
+    Returns:
+        List[Task]: List of task records
     """
     tasks_list = await task_crud.get_many(db, skip=skip, limit=limit)
     return tasks_list
@@ -49,10 +64,18 @@ async def read_single_task_endpoint(
         db: AsyncSession = Depends(get_db_session),
         task_crud: TaskCRUD = Depends(get_task_crud)
 ):
-    """
-    Retrieve data for a specific task by its ID.
+    """Retrieve data for a specific task by its ID.
     
-    - **task_id**: The ID of the task to retrieve.
+    Args:
+        task_id (int): The ID of the task to retrieve
+        db (AsyncSession): Database session
+        task_crud (TaskCRUD): Task CRUD operations handler
+        
+    Returns:
+        Task: Task data
+        
+    Raises:
+        HTTPException: If task with given ID is not found
     """
     db_task = await task_crud.get(db, id=task_id)
     if db_task is None:
@@ -67,12 +90,23 @@ async def update_existing_task_endpoint(
         db: AsyncSession = Depends(get_db_session),
         task_crud: TaskCRUD = Depends(get_task_crud)
 ):
-    """
-    Update data for an existing task.
+    """Update data for an existing task.
     
-    - **task_id**: The ID of the task to update.
-    - **datetime_to_do** (optional): New expected execution time.
-    - **task_info** (optional): New task information.
+    Args:
+        task_id (int): The ID of the task to update
+        task_payload (TaskUpdate): Updated task data
+        db (AsyncSession): Database session
+        task_crud (TaskCRUD): Task CRUD operations handler
+        
+    Returns:
+        Task: Updated task data
+        
+    Raises:
+        HTTPException: If task with given ID is not found
+        
+    Note:
+        - datetime_to_do (optional): New expected execution time
+        - task_info (optional): New task information
     """
     db_task_to_update = await task_crud.get(db, id=task_id)
     if not db_task_to_update:
@@ -87,10 +121,18 @@ async def delete_task_endpoint(
         db: AsyncSession = Depends(get_db_session),
         task_crud: TaskCRUD = Depends(get_task_crud)
 ):
-    """
-    Delete a specific task by its ID.
-
-    - **task_id**: The ID of the task to delete.
+    """Delete a specific task by its ID.
+    
+    Args:
+        task_id (int): The ID of the task to delete
+        db (AsyncSession): Database session
+        task_crud (TaskCRUD): Task CRUD operations handler
+        
+    Returns:
+        Task: Deleted task data
+        
+    Raises:
+        HTTPException: If task with given ID is not found
     """
     deleted_task = await task_crud.delete(db=db, id=task_id)
     if deleted_task is None:

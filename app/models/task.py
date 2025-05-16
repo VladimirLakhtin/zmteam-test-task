@@ -1,3 +1,5 @@
+"""Task model module."""
+
 from datetime import datetime, timezone
 
 from sqlalchemy import String, DateTime, Integer
@@ -6,11 +8,17 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
 
 
-def utc_now():
+def utc_now() -> datetime:
+    """Get current UTC datetime.
+    
+    Returns:
+        datetime: Current datetime in UTC timezone
+    """
     return datetime.now(timezone.utc)
 
 
 class Task(Base):
+    """Task model for storing task information."""
     __tablename__ = "tasks"
 
     id: Mapped[int] = mapped_column(

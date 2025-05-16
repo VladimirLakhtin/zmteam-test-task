@@ -1,5 +1,5 @@
+"""Schemas"""
 from app.schemas.jwt_token import (
-    Token,
     TokenData,
 )
 from app.schemas.task import (
@@ -12,6 +12,5 @@ __all__ = (
     TaskBase,
     TaskCreate,
     TaskUpdate,
-    Token,
     TokenData,
 )

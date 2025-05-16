@@ -1,3 +1,5 @@
+"""Main application module."""
+
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -10,6 +12,7 @@ from app.infrastructure.config import settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Application lifespan manager."""
     yield
     await db_connection.dispose()
 
