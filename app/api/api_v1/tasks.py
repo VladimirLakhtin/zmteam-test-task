@@ -5,8 +5,10 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.crud.exeptions import CRUDException, NotFoundError
 from app.crud.task import TaskCRUD
 from app.dependencies import get_db_session, get_task_crud
+from app.infrastructure.logger import logger
 from app.schemas.task import Task, TaskCreate, TaskUpdate
 
 router = APIRouter(tags=["tasks"])
@@ -32,8 +34,13 @@ async def create_new_task_endpoint(
         - datetime_to_do: Expected execution time for the task (UTC recommended)
         - task_info: Information about the task
     """
-    db_task = await task_crud.create(db=db, obj_in=task_payload)
-    return db_task
+    try:
+        task = await task_crud.create(db=db, obj_in=task_payload)
+        logger.info(f"Task created: ID={task.id}")
+        return task
+    except CRUDException as e:
+        logger.exception("Unhandled CRUDException during creation")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/list", response_model=List[Task])
@@ -54,8 +61,13 @@ async def read_all_tasks_endpoint(
     Returns:
         List[Task]: List of task records
     """
-    tasks_list = await task_crud.get_many(db, skip=skip, limit=limit)
-    return tasks_list
+    try:
+        tasks = await task_crud.get_many(db=db, skip=skip, limit=limit)
+        logger.info(f"Fetched {len(tasks)} tasks")
+        return tasks
+    except CRUDException as e:
+        logger.exception("Failed to fetch tasks")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/{task_id}", response_model=Task)
@@ -77,10 +89,18 @@ async def read_single_task_endpoint(
     Raises:
         HTTPException: If task with given ID is not found
     """
-    db_task = await task_crud.get(db, id=task_id)
-    if db_task is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
-    return db_task
+    try:
+        task = await task_crud.get(db, id=task_id)
+        if not task:
+            raise NotFoundError(f"Task with id={task_id} not found")
+        logger.info(f"Task fetched: ID={task.id}")
+        return task
+    except NotFoundError as e:
+        logger.warning(f"NotFoundError: {e}")
+        raise HTTPException(status_code=404, detail=str(e))
+    except CRUDException as e:
+        logger.exception("Failed to fetch task")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.patch("/{task_id}/update", response_model=Task)
@@ -108,11 +128,19 @@ async def update_existing_task_endpoint(
         - datetime_to_do (optional): New expected execution time
         - task_info (optional): New task information
     """
-    db_task_to_update = await task_crud.get(db, id=task_id)
-    if not db_task_to_update:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
-    updated_task = await task_crud.update(db=db, db_obj=db_task_to_update, obj_in=task_payload)
-    return updated_task
+    try:
+        task = await task_crud.get(db, id=task_id)
+        if not task:
+            raise NotFoundError(f"Task with id={task_id} not found")
+        updated = await task_crud.update(db=db, db_obj=task, obj_in=task_payload)
+        logger.info(f"Task updated: ID={updated.id}")
+        return updated
+    except NotFoundError as e:
+        logger.warning(f"NotFoundError: {e}")
+        raise HTTPException(status_code=404, detail=str(e))
+    except CRUDException as e:
+        logger.exception("Failed to update task")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.delete("/{task_id}", response_model=Task)
@@ -134,7 +162,13 @@ async def delete_task_endpoint(
     Raises:
         HTTPException: If task with given ID is not found
     """
-    deleted_task = await task_crud.delete(db=db, id=task_id)
-    if deleted_task is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
-    return deleted_task
+    try:
+        deleted = await task_crud.delete(db=db, id=task_id)
+        logger.info(f"Task deleted: ID={deleted.id}")
+        return deleted
+    except NotFoundError as e:
+        logger.warning(f"NotFoundError: {e}")
+        raise HTTPException(status_code=404, detail=str(e))
+    except CRUDException as e:
+        logger.exception("Failed to delete task")
+        raise HTTPException(status_code=500, detail="Internal server error")

@@ -8,6 +8,19 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 ENV_FILEPATH = pathlib.Path(__file__).parent.parent.parent / ".env"
 
 
+class LoggerConfig(BaseSettings):
+    """Logger configuration settings."""
+
+    level: str = "INFO"
+    format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    date_format: str = "%Y-%m-%d %H:%M:%S"
+    file_path: str | None = None
+    max_bytes: int = 10_000_000
+    backup_count: int = 5
+
+    model_config = SettingsConfigDict(env_prefix="LOG__")
+
+
 class ApiPrefixConfig(BaseModel):
     """API prefix configuration.
     
@@ -108,6 +121,7 @@ class Settings(BaseSettings):
     api_prefix: ApiPrefixConfig = ApiPrefixConfig()
     auth: AuthConfig = AuthConfig()
     db: DatabaseConfig = DatabaseConfig()
+    logger: LoggerConfig = LoggerConfig()
 
 
 settings = Settings(_env_file=ENV_FILEPATH)

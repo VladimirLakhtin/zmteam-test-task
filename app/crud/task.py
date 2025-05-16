@@ -1,8 +1,8 @@
 """Task CRUD operations module."""
 
+from app.crud.base import BaseCRUD
 from app.models.task import Task
 from app.schemas.task import TaskCreate, TaskUpdate
-from .base import BaseCRUD
 
 
 class TaskCRUD(BaseCRUD[Task, TaskCreate, TaskUpdate]):
