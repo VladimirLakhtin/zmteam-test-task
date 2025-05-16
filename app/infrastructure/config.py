@@ -7,7 +7,8 @@ ENV_FILEPATH = pathlib.Path(__file__).parent.parent.parent / ".env"
 
 
 class ApiPrefixConfig(BaseModel):
-    prefix: str = "/api"
+    api: str = "/api"
+    tasks: str = "/tasks"
 
 
 class RunConfig(BaseModel):
