@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: zmteam_postgres
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_HOST: ${DB__HOST}
+      POSTGRES_USER: ${DB__USER}
+      POSTGRES_PASSWORD: ${DB__PASSWORD}
+      POSTGRES_DB: ${DB__NAME}
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - main_network
+
+volumes:
+  postgres_data:
+networks:
+  main_network:
+    driver: bridge
