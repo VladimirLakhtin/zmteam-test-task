@@ -1,6 +1,26 @@
 version: '3.8'
 
 services:
+  backend:
+    container_name: zmteam_backend
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: zmteam-backend-base
+    ports:
+      - "8000:80"
+    volumes:
+      - ./app:/app/app
+    env_file:
+      - .env
+    environment:
+      PYTHONBUFFERED: 1
+    depends_on:
+      - db
+    networks:
+      - main_network
+    command: ["uvicorn", "app.main:main_app", "--host", "${RUN__HOST}", "--port", "${RUN__PORT}", "--reload"]
+
   db:
     container_name: zmteam_postgres
     image: postgres:15
