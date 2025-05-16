@@ -16,6 +16,8 @@ RUN uv pip install --system --no-cache --requirement /app/pyproject.toml
 # Copy the rest of the application code into the container at /app
 COPY ./app /app/app
 COPY ./.env /app/.env
+COPY ./alembic alembic
+COPY ./alembic.ini alembic.ini
 
 # Make port 80 available to the world outside this container
 EXPOSE 80

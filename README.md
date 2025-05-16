@@ -224,7 +224,7 @@ class TelegramService:
 1. Клонировать репозиторий
 2. Настроить переменные окружения в `.env`
 3. Запустить docker-compose.yaml
-4. Запустить миграции: `alembic upgrade head`
+4. Запустить миграции в консоли контейнера backend: `alembic upgrade head`
 
 ## API Endpoints
 
